@@ -1,3 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"/>
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/nav_gallery"
+        android:icon="@drawable/icon_settings"
+        android:title="Settings"
+        app:showAsAction="always"
+        app:iconTint="@android:color/white" />
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/icon_map"
+        android:title="Map"
+        app:showAsAction="always"
+        app:iconTint="@android:color/white" />
+    <item
+        android:id="@+id/nav_slideshow"
+        android:icon="@drawable/icon_compass"
+        android:title="Compass"
+        app:showAsAction="always"
+        app:iconTint="@android:color/white" />
+</menu>
