@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -175,7 +176,6 @@ public class SondeHubCollector implements Runnable {
     private class ParseSondeList implements SondeParser {
         public void parse(String data) {
             sonde_entries = new ArrayList<>();
-            sonde_entries.add("Sondehub:");
             try {
                 JSONObject json = new JSONObject(data);
                 JSONArray names = json.names();
@@ -184,13 +184,23 @@ public class SondeHubCollector implements Runnable {
                     String name = names.getString(i);
                     sonde_entries.add(name);
                 }
+                Collections.sort(sonde_entries);
             } catch (Exception e) {
                 sonde_entries.add("Error fetching sonde list");
                 e.printStackTrace();
             }
         }
     }
-    public void fillMenu(Activity activity, PopupMenu menu) {
+    public void fillMenu(Activity activity, PopupMenu menu, String filterPhrase) {
+
+        String filter;
+        if(filterPhrase != null && !filterPhrase.trim().isEmpty())
+        {
+            filter = filterPhrase.trim();
+        } else {
+            filter = null;
+        }
+
         Thread updateThread = new Thread(()-> {
             try {
                 URL url = new URL(BASE_URL + "sondes/telemetry?duration=1h");
@@ -199,8 +209,20 @@ public class SondeHubCollector implements Runnable {
                 activity.runOnUiThread(()-> {
                     menu.dismiss();
                     menu.getMenu().clear();
-                    for (String s : sonde_entries)
-                        menu.getMenu().add(s);
+
+                    if(filter == null) {
+                        menu.getMenu().add("Sondehub:");
+                    } else {
+                        menu.getMenu().add(String.format("Sondehub (%s):", filter));
+                    }
+
+                    for (String s : sonde_entries) {
+                        if (filter == null) {
+                            menu.getMenu().add(s);
+                        } else if (s.toLowerCase().contains(filter.toLowerCase())) {
+                            menu.getMenu().add(s);
+                        }
+                    }
                     menu.show();
                 });
 

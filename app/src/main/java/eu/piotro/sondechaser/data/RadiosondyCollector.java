@@ -17,6 +17,7 @@ import java.io.StringReader;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.TimeZone;
@@ -323,8 +324,6 @@ public class RadiosondyCollector implements Runnable {
                 Document doc = builder.parse(new InputSource(new StringReader("<root>"+data+"</root>")));
                 NodeList items = doc.getElementsByTagName("tr");
 
-                sonde_entries.add("Radiosondy:");
-
                 for (int ii=1; ii<items.getLength(); ii++) {
                     Node item = items.item(ii);
                     String name = item.getChildNodes().item(1).getTextContent();
@@ -332,6 +331,7 @@ public class RadiosondyCollector implements Runnable {
                     System.out.println(name + site);
                     sonde_entries.add(name + " (" + site + ") " + (sonde_notifications.contains(name) ? "(NOTIF)" : ""));
                 }
+                Collections.sort(sonde_entries);
             } catch (Exception e) {
                 sonde_entries.add("Error fetching sonde list");
                 e.printStackTrace();
@@ -359,9 +359,19 @@ public class RadiosondyCollector implements Runnable {
         }
     }
 
-    public void fillMenu(Activity activity, PopupMenu menu) {
+    public void fillMenu(Activity activity, PopupMenu menu, String filterPhrase) {
+
+        String filter;
+        if(filterPhrase != null && !filterPhrase.trim().isEmpty())
+        {
+            filter = filterPhrase.trim();
+        } else {
+            filter = null;
+        }
+
         Thread updateThread = new Thread(()-> {
             try {
+
                 URL urln = new URL(BASE_URL + "dyn/get_alerts.php");
                 downloadData(urln, new ParseNotifications());
                 URL url = new URL(BASE_URL + "dyn/get_flying.php");
@@ -370,8 +380,21 @@ public class RadiosondyCollector implements Runnable {
                 activity.runOnUiThread(()-> {
                     menu.dismiss();
                     menu.getMenu().clear();
-                    for (String s : sonde_entries)
-                        menu.getMenu().add(s);
+
+                    if(filter == null) {
+                        menu.getMenu().add("Radiosondy:");
+                    } else {
+                        menu.getMenu().add(String.format("Radiosondy (%s):", filter));
+                    }
+
+                    for (String s : sonde_entries) {
+                        if(filter == null) {
+                            menu.getMenu().add(s);
+                        }
+                        else if(s.toLowerCase().contains(filter.toLowerCase())) {
+                            menu.getMenu().add(s);
+                        }
+                    }
                     menu.show();
                 });
 

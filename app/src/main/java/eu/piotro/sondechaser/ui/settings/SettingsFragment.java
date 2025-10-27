@@ -5,11 +5,14 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -97,18 +100,62 @@ public class SettingsFragment extends Fragment {
 
         ((TextView) v.findViewById(R.id.ap0ip)).setMovementMethod(new ScrollingMovementMethod());
 
+        // configure clearing of radiosondy edit text
+        v.findViewById(R.id.tfrs).setOnTouchListener((vv, event) -> {
+            final int DRAWABLE_END = 2;
+
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                EditText editText = vv.findViewById(R.id.tfrs);
+                if (editText.getCompoundDrawables()[DRAWABLE_END] != null) {
+                    int drawableWidth = editText.getCompoundDrawables()[DRAWABLE_END].getBounds().width();
+                    if (event.getRawX() >= (editText.getRight() - drawableWidth - editText.getPaddingEnd())) {
+                        editText.getText().clear();
+                        return true;
+                    }
+                }
+            }
+            return false;
+        });
+
         v.findViewById(R.id.searchrs).setOnClickListener((view) -> {
+            // hide the keyboard
+            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(v.findViewById(R.id.tfrs).getWindowToken(), 0);
+
             rsPopupMenu.getMenu().clear();
             rsPopupMenu.getMenu().add("Fetching...");
-            new RadiosondyCollector().fillMenu(getActivity(), rsPopupMenu);
+            String filterPhrase = ((TextView)v.findViewById(R.id.tfrs)).getText().toString();
+            new RadiosondyCollector().fillMenu(getActivity(), rsPopupMenu, filterPhrase);
 
             rsPopupMenu.show();
         });
 
+        // configure clearing of sondehub edit text
+        v.findViewById(R.id.tfsh).setOnTouchListener((vv, event) -> {
+            final int DRAWABLE_END = 2;
+
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                EditText editText = vv.findViewById(R.id.tfsh);
+                if (editText.getCompoundDrawables()[DRAWABLE_END] != null) {
+                    int drawableWidth = editText.getCompoundDrawables()[DRAWABLE_END].getBounds().width();
+                    if (event.getRawX() >= (editText.getRight() - drawableWidth - editText.getPaddingEnd())) {
+                        editText.getText().clear();
+                        return true;
+                    }
+                }
+            }
+            return false;
+        });
+
         v.findViewById(R.id.searchsh).setOnClickListener((view) -> {
+            // hide the keyboard
+            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(v.findViewById(R.id.tfsh).getWindowToken(), 0);
+
             shPopupMenu.getMenu().clear();
             shPopupMenu.getMenu().add("Fetching...");
-            new SondeHubCollector().fillMenu(getActivity(), shPopupMenu);
+            String filterPhrase = ((TextView)v.findViewById(R.id.tfsh)).getText().toString();
+            new SondeHubCollector().fillMenu(getActivity(), shPopupMenu, filterPhrase);
 
             shPopupMenu.show();
         });
