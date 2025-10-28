@@ -214,6 +214,8 @@ public class MapUpdater {
                         sondeMarker.setIcon(bitmapParachute);
                     }
 
+                    homeFragment.mapView.invalidate();
+
                     } catch (Exception ignored){}
                 });
             } catch (Exception ignored){}
@@ -250,6 +252,8 @@ public class MapUpdater {
                         e.printStackTrace();
                     }
                 }
+
+                homeFragment.mapView.invalidate();
             });
         }catch (Exception ignored){}
     }
@@ -321,6 +325,8 @@ public class MapUpdater {
                         localPredMarker.setTitle("LOCAL PREDICTION INTERPOLATION\n"+lc_pred.point.getLatitude() + "\n" + lc_pred.point.getLongitude() + "\n" + lc_pred.alt);
                     } else
                         localPredMarker.setVisible(false);
+
+                    homeFragment.mapView.invalidate();
                 } catch (Exception e){e.printStackTrace();} // setting point position can be dangerous
             });
         } catch (Exception ignored){}
@@ -356,6 +362,8 @@ public class MapUpdater {
                     } else {
                         shLastMarker.setVisible(false);
                     }
+
+                    homeFragment.mapView.invalidate();
                 } catch (Exception e) {e.printStackTrace();}
             });
         } catch (Exception ignored){}
