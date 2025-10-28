@@ -12,12 +12,15 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 
 import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.util.MapTileIndex;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
@@ -101,6 +104,58 @@ public class HomeFragment extends Fragment {
         v.findViewById(R.id.predbtn).setOnClickListener((_v) -> {
             mapView.getController().animateTo(updater.last_pred);
         });
+
+        v.findViewById(R.id.mapsourcebtn).setOnClickListener((_v) -> {
+            PopupMenu popup = new PopupMenu(HomeFragment.this.getContext(), _v);
+            popup.getMenu().add("Mapnik (Default)");
+            popup.getMenu().add("Carto Voyager");
+            popup.getMenu().add("OpenTopoMap");
+
+            popup.setOnMenuItemClickListener(item -> {
+                String title = item.getTitle().toString();
+
+                switch (title) {
+                    case "Mapnik (Default)":
+                        mapView.setTileSource(TileSourceFactory.MAPNIK);
+                        break;
+
+                    case "Carto Voyager":
+                        mapView.setTileSource(new OnlineTileSourceBase(
+                                "CartoVoyager", 0, 19, 256, "",
+                                new String[]{"https://a.basemaps.cartocdn.com/rastertiles/voyager/"}) {
+                            @Override
+                            public String getTileURLString(long pMapTileIndex) {
+                                return getBaseUrl()
+                                        + MapTileIndex.getZoom(pMapTileIndex) + "/"
+                                        + MapTileIndex.getX(pMapTileIndex) + "/"
+                                        + MapTileIndex.getY(pMapTileIndex) + ".png";
+                            }
+                        });
+                        break;
+
+                    case "OpenTopoMap":
+                        mapView.setTileSource(new OnlineTileSourceBase(
+                                "OpenTopoMap", 0, 17, 256, "",
+                                new String[]{"https://a.tile.opentopomap.org/"}) {
+                            @Override
+                            public String getTileURLString(long pMapTileIndex) {
+                                return getBaseUrl()
+                                        + MapTileIndex.getZoom(pMapTileIndex) + "/"
+                                        + MapTileIndex.getX(pMapTileIndex) + "/"
+                                        + MapTileIndex.getY(pMapTileIndex) + ".png";
+                            }
+                        });
+                        break;
+                }
+
+                mapView.invalidate();
+                Toast.makeText(HomeFragment.this.getContext(), "Switched to " + title, Toast.LENGTH_SHORT).show();
+                return true;
+            });
+
+            popup.show();
+        });
+
         while (getActivity() == null) {}
         v.findViewById(R.id.refrbtn).setOnClickListener((_v) -> {
             try {
@@ -122,6 +177,7 @@ public class HomeFragment extends Fragment {
                         .show();
             });
         }
+
         onResume();
     }
 

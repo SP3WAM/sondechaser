@@ -26,6 +26,20 @@
         </org.osmdroid.views.MapView>
 
         <ImageButton
+            android:id="@+id/mapsourcebtn"
+            style="@android:style/Widget.DeviceDefault.ImageButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="5dp"
+            android:adjustViewBounds="true"
+            android:padding="7dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/baseline_layers_24"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/blackaware" />
+
+        <ImageButton
             android:id="@+id/locbtn"
             style="@android:style/Widget.DeviceDefault.ImageButton"
             android:layout_width="48dp"
