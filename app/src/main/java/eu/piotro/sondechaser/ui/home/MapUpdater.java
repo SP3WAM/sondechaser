@@ -54,6 +54,9 @@ public class MapUpdater {
 
     private final View view;
 
+    private BitmapDrawable bitmapBaloon = null;
+    private BitmapDrawable bitmapParachute = null;
+
     public MapUpdater(HomeFragment homeFragment, View v, Context c) {
         this.homeFragment = homeFragment;
         view = v;
@@ -61,10 +64,17 @@ public class MapUpdater {
         sondeMarker = new Marker(homeFragment.mapView);
         sondeMarker.setVisible(false);
         sondeMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+
         Drawable ballon = ContextCompat.getDrawable(c, R.drawable.baloon);
         Bitmap b = ((BitmapDrawable)ballon).getBitmap();
-        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, b.getWidth()/5, b.getHeight()/5, false);
-        sondeMarker.setIcon(new BitmapDrawable(homeFragment.getResources(), bitmapResized));
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, b.getWidth()/3, b.getHeight()/3, false);
+        bitmapBaloon = new BitmapDrawable(homeFragment.getResources(), bitmapResized);
+        Drawable parachute = ContextCompat.getDrawable(c, R.drawable.parachute);
+        Bitmap bb = ((BitmapDrawable)parachute).getBitmap();
+        Bitmap bitmapParachuteResized = Bitmap.createScaledBitmap(bb, bb.getWidth()/3, bb.getHeight()/3, false);
+        bitmapParachute = new BitmapDrawable(homeFragment.getResources(), bitmapParachuteResized);
+
+        sondeMarker.setIcon(bitmapBaloon);
         homeFragment.mapView.getOverlays().add(sondeMarker);
 
         rsPathLine = new Polyline(homeFragment.mapView);
@@ -197,6 +207,12 @@ public class MapUpdater {
                         sondeMarker.setVisible(!hide);
                     sondeMarker.setPosition(sonde.loc);
                     sondeMarker.setTitle("POSITION\n" + (float)sonde.loc.getLatitude() + " " + (float)sonde.loc.getLongitude() + "\n" + sonde.alt + "m\n" + new Date(sonde.time) + "\n" + source + "\n");
+                    if(sonde.vspeed >= 0.0) {
+                        sondeMarker.setIcon(bitmapBaloon);
+                    }
+                    else {
+                        sondeMarker.setIcon(bitmapParachute);
+                    }
 
                     } catch (Exception ignored){}
                 });
