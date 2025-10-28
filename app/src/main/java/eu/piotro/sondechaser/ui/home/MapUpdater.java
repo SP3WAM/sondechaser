@@ -228,12 +228,27 @@ public class MapUpdater {
                 try {
                     rsPathLine.setPoints(rs_col.getSondeTrack());
                     rsPredLine.setPoints(rs_col.getPrediction());
+                } catch (Exception e) {
+                    if (!(e instanceof NullPointerException)) {
+                        e.printStackTrace();
+                    }
+                }
+
+                try {
                     shPathLine.setPoints(sh_col.getSondeTrack());
                     shPredLine.setPoints(sh_col.getPrediction());
+                } catch (Exception e) {
+                    if (!(e instanceof NullPointerException)) {
+                        e.printStackTrace();
+                    }
+                }
+
+                try {
                     localPathLine.setPoints(lc_col.getSondeTrack());
                 } catch (Exception e) {
-                    if (!(e instanceof NullPointerException))
+                    if (!(e instanceof NullPointerException)) {
                         e.printStackTrace();
+                    }
                 }
             });
         }catch (Exception ignored){}
