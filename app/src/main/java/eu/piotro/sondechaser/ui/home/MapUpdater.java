@@ -34,6 +34,8 @@ public class MapUpdater {
 
     private Marker sondeMarker;
 
+    private Marker balloonBurstMarker;
+
     private Marker rsPredMarker;
     private Marker rsLastMarker;
     private Polyline rsPathLine;
@@ -65,6 +67,10 @@ public class MapUpdater {
         sondeMarker.setVisible(false);
         sondeMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
 
+        balloonBurstMarker = new Marker(homeFragment.mapView);
+        balloonBurstMarker.setVisible(false);
+        balloonBurstMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+
         Drawable ballon = ContextCompat.getDrawable(c, R.drawable.baloon);
         Bitmap b = ((BitmapDrawable)ballon).getBitmap();
         Bitmap bitmapResized = Bitmap.createScaledBitmap(b, b.getWidth()/3, b.getHeight()/3, false);
@@ -73,9 +79,15 @@ public class MapUpdater {
         Bitmap bb = ((BitmapDrawable)parachute).getBitmap();
         Bitmap bitmapParachuteResized = Bitmap.createScaledBitmap(bb, bb.getWidth()/3, bb.getHeight()/3, false);
         bitmapParachute = new BitmapDrawable(homeFragment.getResources(), bitmapParachuteResized);
+        Drawable ballonBurstDrawable = ContextCompat.getDrawable(c, R.drawable.balloon_burst);
+        Bitmap balloonBurstBitmap = ((BitmapDrawable)ballonBurstDrawable).getBitmap();
+        Bitmap balloonBurstBitmapResized = Bitmap.createScaledBitmap(balloonBurstBitmap, balloonBurstBitmap.getWidth()/2, balloonBurstBitmap.getHeight()/2, false);
+        balloonBurstMarker.setIcon(new BitmapDrawable(homeFragment.getResources(), balloonBurstBitmapResized));
 
         sondeMarker.setIcon(bitmapBaloon);
         homeFragment.mapView.getOverlays().add(sondeMarker);
+
+        homeFragment.mapView.getOverlays().add(balloonBurstMarker);
 
         rsPathLine = new Polyline(homeFragment.mapView);
         rsPathLine.setEnabled(true);
@@ -251,6 +263,18 @@ public class MapUpdater {
                     if (!(e instanceof NullPointerException)) {
                         e.printStackTrace();
                     }
+                }
+
+                try {
+                    Point balloonBurstPoint = sh_col.getBalloonBurstPoint();
+                    balloonBurstMarker.setVisible(false);
+                    if(balloonBurstPoint != null) {
+                        balloonBurstMarker.setPosition(balloonBurstPoint.point);
+                        balloonBurstMarker.setVisible(true);
+                    }
+                    localPathLine.setPoints(lc_col.getSondeTrack());
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
                 homeFragment.mapView.invalidate();

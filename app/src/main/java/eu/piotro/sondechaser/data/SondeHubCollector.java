@@ -27,6 +27,7 @@ public class SondeHubCollector implements Runnable {
     private ArrayList<GeoPoint> track;
     private ArrayList<GeoPoint> prediction;
     private Point pred_point;
+    private Point balloonBurstPoint = null;
     //long start_time = 0;
     public volatile long last_decoded;
     private final Object dataLock = new Object();
@@ -112,8 +113,18 @@ public class SondeHubCollector implements Runnable {
                 String path = curr.getString("data");
                 JSONArray pathobj = new JSONArray(path);
                 ArrayList<GeoPoint> gps = new ArrayList<>();
+                Double lastAltitude = null;
+                balloonBurstPoint = null;
                 for (int i=0; i<pathobj.length(); i++) {
                     JSONObject entry = pathobj.getJSONObject(i);
+                    Double altitude = entry.getDouble("alt");
+                    if(balloonBurstPoint == null && lastAltitude != null && altitude < lastAltitude) {
+                        // balloon burst detected
+                        balloonBurstPoint = new Point();
+                        balloonBurstPoint.point = new GeoPoint(entry.getDouble("lat"), entry.getDouble("lon"));
+                    }
+                    lastAltitude = altitude;
+
                     gps.add(new GeoPoint(entry.getDouble("lat"), entry.getDouble("lon")));
                 }
 
@@ -166,6 +177,12 @@ public class SondeHubCollector implements Runnable {
     public ArrayList<GeoPoint> getSondeTrack() {
         synchronized (dataLock) {
             return track;
+        }
+    }
+
+    public Point getBalloonBurstPoint() {
+        synchronized (dataLock) {
+            return balloonBurstPoint;
         }
     }
 
