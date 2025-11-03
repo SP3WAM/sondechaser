@@ -144,24 +144,36 @@ public class SondeHubCollector implements Runnable {
         }
 
         public Point findBalloonBurstPoint(JSONArray pathobj) {
-            Double lastAltitude = null;
+            if(pathobj.length() < 2)
+            {
+                return null;
+            }
             Point balloonBurstPoint = null;
             try {
-                for (int i = 0; i < pathobj.length(); i++) {
-                    JSONObject entry = pathobj.getJSONObject(i);
-                    Double altitude = entry.getDouble("alt");
-                    if (balloonBurstPoint == null && lastAltitude != null && altitude < lastAltitude) {
-                        // balloon burst detected
+                for (int i = 1; i < pathobj.length(); i++) {
+                    Double alt0 = pathobj.getJSONObject(i - 1).getDouble("alt");
+                    Double alt1 = pathobj.getJSONObject(i).getDouble("alt");
+
+                    if(alt1 > alt0)
+                    {
+                        // increasing function and finding burst point candidate
+                        JSONObject entry = pathobj.getJSONObject(i);
+
                         balloonBurstPoint = new Point();
                         balloonBurstPoint.point = new GeoPoint(entry.getDouble("lat"), entry.getDouble("lon"));
+
+                        continue;
                     }
-                    lastAltitude = altitude;
+                    if(alt1 < alt0 && balloonBurstPoint != null) {
+                        // decreasing function where burst point candidate already found
+                        return balloonBurstPoint;
+                    }
                 }
             } catch (Exception ex) {
-
+                ex.printStackTrace();
             }
 
-            return balloonBurstPoint;
+            return null;
         }
     }
 
