@@ -113,17 +113,9 @@ public class SondeHubCollector implements Runnable {
                 String path = curr.getString("data");
                 JSONArray pathobj = new JSONArray(path);
                 ArrayList<GeoPoint> gps = new ArrayList<>();
-                Double lastAltitude = null;
-                balloonBurstPoint = null;
+                balloonBurstPoint = findBalloonBurstPoint(pathobj);
                 for (int i=0; i<pathobj.length(); i++) {
                     JSONObject entry = pathobj.getJSONObject(i);
-                    Double altitude = entry.getDouble("alt");
-                    if(balloonBurstPoint == null && lastAltitude != null && altitude < lastAltitude) {
-                        // balloon burst detected
-                        balloonBurstPoint = new Point();
-                        balloonBurstPoint.point = new GeoPoint(entry.getDouble("lat"), entry.getDouble("lon"));
-                    }
-                    lastAltitude = altitude;
 
                     gps.add(new GeoPoint(entry.getDouble("lat"), entry.getDouble("lon")));
                 }
@@ -149,6 +141,27 @@ public class SondeHubCollector implements Runnable {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+
+        public Point findBalloonBurstPoint(JSONArray pathobj) {
+            Double lastAltitude = null;
+            Point balloonBurstPoint = null;
+            try {
+                for (int i = 0; i < pathobj.length(); i++) {
+                    JSONObject entry = pathobj.getJSONObject(i);
+                    Double altitude = entry.getDouble("alt");
+                    if (balloonBurstPoint == null && lastAltitude != null && altitude < lastAltitude) {
+                        // balloon burst detected
+                        balloonBurstPoint = new Point();
+                        balloonBurstPoint.point = new GeoPoint(entry.getDouble("lat"), entry.getDouble("lon"));
+                    }
+                    lastAltitude = altitude;
+                }
+            } catch (Exception ex) {
+
+            }
+
+            return balloonBurstPoint;
         }
     }
 
