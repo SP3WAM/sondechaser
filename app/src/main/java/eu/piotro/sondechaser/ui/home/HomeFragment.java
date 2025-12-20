@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -105,6 +106,7 @@ public class HomeFragment extends Fragment {
             mapView.getController().animateTo(updater.last_pred);
         });
 
+        final TextView mapSourceAttributionTextView = v.findViewById(R.id.mapSourceAttributionTextView);
         v.findViewById(R.id.mapsourcebtn).setOnClickListener((_v) -> {
             PopupMenu popup = new PopupMenu(HomeFragment.this.getContext(), _v);
             popup.getMenu().add("Mapnik (Default)");
@@ -117,6 +119,7 @@ public class HomeFragment extends Fragment {
                 switch (title) {
                     case "Mapnik (Default)":
                         mapView.setTileSource(TileSourceFactory.MAPNIK);
+                        mapSourceAttributionTextView.setText("Map ©OpenStreetMap contributors");
                         break;
 
                     case "Carto Voyager":
@@ -131,6 +134,7 @@ public class HomeFragment extends Fragment {
                                         + MapTileIndex.getY(pMapTileIndex) + ".png";
                             }
                         });
+                        mapSourceAttributionTextView.setText("Map ©CartoVoyager contributors");
                         break;
 
                     case "OpenTopoMap":
@@ -145,6 +149,7 @@ public class HomeFragment extends Fragment {
                                         + MapTileIndex.getY(pMapTileIndex) + ".png";
                             }
                         });
+                        mapSourceAttributionTextView.setText("Map ©OpenTopoMap contributors");
                         break;
                 }
 
