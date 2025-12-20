@@ -139,7 +139,7 @@ public class HomeFragment extends Fragment {
 
                     case "OpenTopoMap":
                         mapView.setTileSource(new OnlineTileSourceBase(
-                                "OpenTopoMap", 0, 17, 256, "",
+                                "OpenTopoMap", 0, 15, 256, "",
                                 new String[]{"https://a.tile.opentopomap.org/"}) {
                             @Override
                             public String getTileURLString(long pMapTileIndex) {
